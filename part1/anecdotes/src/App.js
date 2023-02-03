@@ -1,4 +1,10 @@
 import { useState } from 'react'
+const MostVotedAnecdote = ({ anecdotes }) => {
+	const mostVoted = anecdotes.reduce((prev, current) => {
+		return prev.votes > current.votes ? prev : current
+	})
+	return <p>{mostVoted.votes > 0 ? mostVoted.text : 'no votes available'}</p>
+}
 
 const App = () => {
 	const [anecdotes, setAnecdotes] = useState([
@@ -38,10 +44,14 @@ const App = () => {
 
 	return (
 		<>
-			<div>{anecdotes[selected].text}</div>
-			<div>has {anecdotes[selected].votes} votes</div>
+			<h1>Anecdote of the day</h1>
+			<p>{anecdotes[selected].text}</p>
+			<p>has {anecdotes[selected].votes} votes</p>
 			<button onClick={vote}>vote</button>
 			<button onClick={selectNextAnecdote}>next anecdote</button>
+
+			<h1>Anecdote with most votes</h1>
+			<MostVotedAnecdote anecdotes={anecdotes} />
 		</>
 	)
 }
