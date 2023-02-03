@@ -6,24 +6,27 @@ const Statistics = ({ good, neutral, bad }) => {
 	const all = good + neutral + bad
 
 	return (
-		<div>
-			<StatisticLine title='good' value={good} />
-			<StatisticLine title='neutral' value={neutral} />
-			<StatisticLine title='bad' value={bad} />
-			<StatisticLine title='all' value={all} />
-			<StatisticLine title='average' value={all ? (good - bad) / all : 0} />
-			<StatisticLine
-				title='positive'
-				value={all ? (100 * good) / all + '%' : 'no percentage available'}
-			/>
-		</div>
+		<table>
+			<tbody>
+				<StatisticLine title='good' value={good} />
+				<StatisticLine title='neutral' value={neutral} />
+				<StatisticLine title='bad' value={bad} />
+				<StatisticLine title='all' value={all} />
+				<StatisticLine title='average' value={all ? (good - bad) / all : 0} />
+				<StatisticLine
+					title='positive'
+					value={all ? (100 * good) / all + '%' : 'no percentage available'}
+				/>
+			</tbody>
+		</table>
 	)
 }
 
 const StatisticLine = ({ title, value }) => (
-	<div>
-		{title} {value}
-	</div>
+	<tr>
+		<td>{title}</td>
+		<td>{value}</td>
+	</tr>
 )
 
 const App = () => {
