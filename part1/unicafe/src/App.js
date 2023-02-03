@@ -3,9 +3,9 @@ import { useState } from 'react'
 const Button = ({ title, onClick }) => <button onClick={onClick}>{title}</button>
 
 const Statistic = ({ title, value }) => (
-	<p>
+	<div>
 		{title} {value}
-	</p>
+	</div>
 )
 
 const App = () => {
@@ -13,6 +13,8 @@ const App = () => {
 	const [good, setGood] = useState(0)
 	const [neutral, setNeutral] = useState(0)
 	const [bad, setBad] = useState(0)
+
+	const all = good + neutral + bad
 
 	return (
 		<>
@@ -25,6 +27,12 @@ const App = () => {
 			<Statistic title='good' value={good} />
 			<Statistic title='neutral' value={neutral} />
 			<Statistic title='bad' value={bad} />
+			<Statistic title='all' value={all} />
+			<Statistic title='average' value={all ? (good - bad) / all : 0} />
+			<Statistic
+				title='positive'
+				value={all ? (100 * good) / all + '%' : 'no percentage available'}
+			/>
 		</>
 	)
 }
