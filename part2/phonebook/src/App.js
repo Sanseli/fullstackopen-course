@@ -1,5 +1,49 @@
 import { useState } from 'react'
 
+const Filter = ({ personsFilter, handleFilterChange }) => {
+	return (
+		<div>
+			filter shown with <input value={personsFilter} onChange={handleFilterChange} />
+		</div>
+	)
+}
+
+const PersonForm = ({
+	newName,
+	newNumber,
+	handleNewNameChange,
+	handleNewNumberChange,
+	addPerson,
+}) => {
+	return (
+		<form onSubmit={addPerson}>
+			<div>
+				name: <input value={newName} onChange={handleNewNameChange} />
+			</div>
+			<div>
+				number: <input value={newNumber} onChange={handleNewNumberChange} />
+			</div>
+			<div>
+				<button type='submit'>add</button>
+			</div>
+		</form>
+	)
+}
+
+const Persons = ({ persons, personsFilter }) => {
+	return persons
+		.filter((person) =>
+			personsFilter.length > 0
+				? person.name.toLowerCase().includes(personsFilter.toLowerCase())
+				: true
+		)
+		.map((person) => (
+			<div key={person.id}>
+				{person.name} {person.number}
+			</div>
+		))
+}
+
 const App = () => {
 	const [persons, setPersons] = useState([
 		{ name: 'Arto Hellas', number: '040-123456', id: 1 },
@@ -10,21 +54,12 @@ const App = () => {
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 	const [personsFilter, setPersonsFilter] = useState('')
-	const [personsToShow, setPersonsToShow] = useState(persons)
 
 	const handleNewNameChange = (event) => setNewName(event.target.value)
 
 	const handleNewNumberChange = (event) => setNewNumber(event.target.value)
 
-	const handleFilterChange = (event) => {
-		const value = event.target.value
-		setPersonsFilter(value)
-		setPersonsToShow(
-			value.length > 0
-				? persons.filter((person) => person.name.toLowerCase().includes(value.toLowerCase()))
-				: persons
-		)
-	}
+	const handleFilterChange = (event) => setPersonsFilter(event.target.value)
 
 	const addPerson = (event) => {
 		event.preventDefault()
@@ -35,6 +70,7 @@ const App = () => {
 			const personObject = {
 				name: newName,
 				number: newNumber,
+				id: persons.length + 1,
 			}
 			setPersons(persons.concat(personObject))
 			setNewName('')
@@ -45,27 +81,17 @@ const App = () => {
 	return (
 		<div>
 			<h2>Phonebook</h2>
-			<div>
-				filter shown with <input value={personsFilter} onChange={handleFilterChange} />
-			</div>
+			<Filter personsFilter={personsFilter} handleFilterChange={handleFilterChange} />
 			<h2>add a new</h2>
-			<form onSubmit={addPerson}>
-				<div>
-					name: <input value={newName} onChange={handleNewNameChange} />
-				</div>
-				<div>
-					number: <input value={newNumber} onChange={handleNewNumberChange} />
-				</div>
-				<div>
-					<button type='submit'>add</button>
-				</div>
-			</form>
+			<PersonForm
+				newName={newName}
+				newNumber={newNumber}
+				handleNewNameChange={handleNewNameChange}
+				handleNewNumberChange={handleNewNumberChange}
+				addPerson={addPerson}
+			/>
 			<h2>Numbers</h2>
-			{personsToShow.map((person) => (
-				<div key={person.name}>
-					{person.name} {person.number}
-				</div>
-			))}
+			<Persons persons={persons} personsFilter={personsFilter} />
 		</div>
 	)
 }
