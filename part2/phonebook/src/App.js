@@ -45,9 +45,8 @@ const Persons = ({ persons, personsFilter, deletePerson }) => {
 		))
 }
 
-const Notification = ({ message }) => {
+const Notification = ({ message, errorMessage }) => {
 	const notificationStyle = {
-		color: 'green',
 		background: 'lightgrey',
 		fontSize: '20px',
 		borderStyle: 'solid',
@@ -56,11 +55,15 @@ const Notification = ({ message }) => {
 		marginBottom: '10px',
 	}
 
-	if (message === null) {
+	if (message === null && errorMessage === null) {
 		return null
 	}
 
-	return <div style={notificationStyle}>{message}</div>
+	return (
+		<div style={{ ...notificationStyle, color: message ? 'green' : 'red' }}>
+			{message || errorMessage}
+		</div>
+	)
 }
 
 const App = () => {
@@ -69,6 +72,7 @@ const App = () => {
 	const [newNumber, setNewNumber] = useState('')
 	const [personsFilter, setPersonsFilter] = useState('')
 	const [message, setMessage] = useState(null)
+	const [errorMessage, setErrorMessage] = useState(null)
 
 	useEffect(() => {
 		personsService.getAll().then((initialPersons) => setPersons(initialPersons))
@@ -101,6 +105,12 @@ const App = () => {
 							setMessage(null)
 						}, 5000)
 					})
+					.catch(() => {
+						setErrorMessage(`Information of ${person.name} has already been removed from server`)
+						setTimeout(() => {
+							setErrorMessage(null)
+						}, 5000)
+					})
 			}
 		} else {
 			const personObject = {
@@ -123,16 +133,24 @@ const App = () => {
 
 	const deletePerson = (person) => {
 		if (window.confirm(`Delete ${person.name}?`)) {
-			personsService.remove(person.id).then(() => {
-				setPersons(persons.filter((p) => p.id !== person.id))
-			})
+			personsService
+				.remove(person.id)
+				.then(() => {
+					setPersons(persons.filter((p) => p.id !== person.id))
+				})
+				.catch(() => {
+					setErrorMessage(`Information of ${person.name} has already been removed from server`)
+					setTimeout(() => {
+						setErrorMessage(null)
+					}, 5000)
+				})
 		}
 	}
 
 	return (
 		<div>
 			<h2>Phonebook</h2>
-			<Notification message={message} />
+			<Notification message={message} errorMessage={errorMessage} />
 			<Filter personsFilter={personsFilter} handleFilterChange={handleFilterChange} />
 			<h2>add a new</h2>
 			<PersonForm
