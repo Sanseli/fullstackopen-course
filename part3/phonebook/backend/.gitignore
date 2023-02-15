@@ -1,4 +1,2 @@
-# dependencies
 /node_modules
-
-mongo-pass.txt
+.env
