@@ -86,8 +86,10 @@ describe('total likes', () => {
   })
 })
 
-test('favorite blog', () => {
-  const result = listHelper.favoriteBlog(listWithMultipleBlogs)
+describe('favorite blog', () => {
+  test('equals', () => {
+    const result = listHelper.favoriteBlog(listWithMultipleBlogs)
 
-  expect(result).toEqual(listWithMultipleBlogs[2])
+    expect(result).toEqual(listWithMultipleBlogs[2])
+  })
 })
