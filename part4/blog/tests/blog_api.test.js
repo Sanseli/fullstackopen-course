@@ -47,6 +47,23 @@ test('making a HTTP POST request successfully creates a new blog post', async ()
   )
 })
 
+test('likes property is defaulted to value 0', async () => {
+  const newBlog = {
+    title: 'New blog',
+    author: 'Test',
+    url: 'url'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blog = await (await helper.blogsInDb()).find(blog => blog.title === 'New blog')
+  expect(blog.likes).toBe(0)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
