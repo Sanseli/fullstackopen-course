@@ -64,6 +64,28 @@ test('likes property is defaulted to value 0', async () => {
   expect(blog.likes).toBe(0)
 })
 
+test('responds with 400 when title or url are missing', async () => {
+  const newBlogWithoutTitle = {
+    author: 'Test',
+    url: 'url'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlogWithoutTitle)
+    .expect(400)
+
+  const newBlogWithoutUrl = {
+    title: 'New blog',
+    author: 'Test',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlogWithoutUrl)
+    .expect(400)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
