@@ -86,6 +86,48 @@ test('responds with 400 when title or url are missing', async () => {
     .expect(400)
 })
 
+describe('updating the information of a blog', () => {
+  test('succeeds with status code of 200 and has the updated value of likes', async () => {
+    const editedBlog ={
+      id: '5a422a851b54a676234d17f7',
+      title: 'React patterns',
+      author: 'Michael Chan',
+      url: 'https://reactpatterns.com/',
+      likes: 10,
+    }
+
+    await api
+      .put('/api/blogs/5a422a851b54a676234d17f7')
+      .send(editedBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const updatedBlog = await (await helper.blogsInDb()).find(blog => blog.id === '5a422a851b54a676234d17f7')
+    expect(updatedBlog.likes).toBe(10)
+  })
+})
+
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    expect(blogsAtEnd).toHaveLength(
+      helper.initialBlogs.length - 1
+    )
+
+    const titles = blogsAtEnd.map(r => r.title)
+
+    expect(titles).not.toContain(blogToDelete.title)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
