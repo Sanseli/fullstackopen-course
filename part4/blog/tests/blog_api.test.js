@@ -4,6 +4,8 @@ const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+// const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -12,6 +14,9 @@ beforeEach(async () => {
     .map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+  await User.deleteMany({})
+  // await User.insertManclay(helper.initialUsers)
 })
 
 test('correct amount of blog posts are returned', async () => {
@@ -125,6 +130,81 @@ describe('deletion of a blog', () => {
     const titles = blogsAtEnd.map(r => r.title)
 
     expect(titles).not.toContain(blogToDelete.title)
+  })
+})
+
+describe('creation of a user', () => {
+  test('user should have a username', async () => {
+    const newUser = {
+      name: 'user',
+      password: 'test',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('{"error":"User validation failed: username: Path `username` is required."}')
+  })
+
+  test('user should have a password', async () => {
+    const newUser = {
+      username: 'test',
+      name: 'user',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('{"error":"User validation failed: password: Path `password` is required."}')
+  })
+
+  test('doesn\'t succeed when a username has less than 3 characters', async () => {
+    const newUser1 = {
+      username: 'qq',
+      name: 'user',
+      password: 'test',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser1)
+      .expect(400)
+      .expect('{"error":"User validation failed: username: Path `username` (`qq`) is shorter than the minimum allowed length (3)."}')
+  })
+
+  test('doesn\'t succeed when a password has less than 3 characters', async () => {
+    const newUser2 = {
+      username: 'user',
+      name: 'user',
+      password: 'qq',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser2)
+      .expect(400)
+      .expect('{"error":"password must be at least 3 characters long"}')
+  })
+
+  test('username should be unique', async () => {
+    const newUser = {
+      username: 'test',
+      name: 'user',
+      password: 'test'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(500)
+      .expect('{"error":"Username is not unique"}')
   })
 })
 
