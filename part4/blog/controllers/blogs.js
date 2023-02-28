@@ -1,9 +1,11 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogsRouter.get('/', (request, response, next) => {
   Blog
     .find({})
+    .populate('user', { username: 1, name: 1 })
     .then(blogs => {
       response.json(blogs)
     })
@@ -19,7 +21,12 @@ blogsRouter.post('/', (request, response, next) => {
   blog
     .save()
     .then(result => {
-      response.status(201).json(result)
+      User.findById(blog.user).then((user) => {
+        user.blogs = user.blogs.concat(result._id)
+        user.save().then(() => {
+          response.status(201).json(result)
+        })
+      })
     })
     .catch(error => next(error))
 })
