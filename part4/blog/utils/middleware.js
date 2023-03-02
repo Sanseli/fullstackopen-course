@@ -21,17 +21,17 @@ const tokenExtractor = async (request, response, next) => {
 }
 
 const userExtractor = async (request, response, next) => {
-  // if (jwt) {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
+  if (request.token) {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'Unauthorized' })
+    }
 
-  const user = await User.findById(decodedToken.id)
-  if (user) {
-    request.user = user
-  }
-  // }
+    const user = await User.findById(decodedToken.id)
+    if (user) {
+      request.user = user
+    }
+  } else return response.status(401).json({ error: 'Unauthorized' })
 
   next()
 }
