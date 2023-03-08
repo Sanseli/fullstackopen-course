@@ -46,40 +46,50 @@ const App = () => {
 		}
 	}
 
-	const loginForm = () => (
-		<form onSubmit={handleLogin}>
-			<h2>log in to application</h2>
-			<div>
-				username
-				<input
-					type='text'
-					value={username}
-					name='Username'
-					onChange={({ target }) => setUsername(target.value)}
-				/>
-			</div>
-			<div>
-				password
-				<input
-					type='password'
-					value={password}
-					name='Password'
-					onChange={({ target }) => setPassword(target.value)}
-				/>
-			</div>
-			<button type='submit'>login</button>
-		</form>
-	)
+	const handleLogout = () => {
+		window.localStorage.removeItem('loggedNoteappUser')
+		setUser(null)
+	}
+
+	if (user === null) {
+		return (
+			<form onSubmit={handleLogin}>
+				<h2>log in to application</h2>
+				<div>
+					username
+					<input
+						type='text'
+						value={username}
+						name='Username'
+						onChange={({ target }) => setUsername(target.value)}
+					/>
+				</div>
+				<div>
+					password
+					<input
+						type='password'
+						value={password}
+						name='Password'
+						onChange={({ target }) => setPassword(target.value)}
+					/>
+				</div>
+				<button type='submit'>login</button>
+			</form>
+		)
+	}
 
 	return (
-		<div>
-			{user === null ? loginForm() : `${user.name} logged in`}
-
+		<>
 			<h2>blogs</h2>
+			<div>
+				{`${user.name} logged in`} <button onClick={handleLogout}>logout</button>
+			</div>
+			<br />
+
 			{blogs.map((blog) => (
 				<Blog key={blog.id} blog={blog} />
 			))}
-		</div>
+		</>
 	)
 }
 
